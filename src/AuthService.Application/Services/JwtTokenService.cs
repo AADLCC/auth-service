@@ -5,18 +5,17 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
 namespace AuthService.Application.Services;
 
 public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
 {
-public string GenerateToken(User user)
+    public string GenerateToken(User user)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
         var issuer = jwtSettings["Issuer"] ?? "AuthDotnet";
         var audience = jwtSettings["Audience"] ?? "AuthDotnet";
-        var expiryInMinutes = int.Parse(jwtSettings["ExpiryInMinutes"] ?? "30");
+        var expiryInMinutes = int.Parse(jwtSettings["ExpiryInMinutes"] ?? "120");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

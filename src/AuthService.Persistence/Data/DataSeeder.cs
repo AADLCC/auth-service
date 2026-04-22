@@ -23,11 +23,11 @@ public static class DataSeeder
                         Name = RoleConstants.USER_ROLE
                 }
             };
- 
+
             await context.Roles.AddRangeAsync(roles);
             await context.SaveChangesAsync();
         }
- 
+
         // Seed de un usuario administrador por defecto SOLO si no existen usuarios todavía
         if (!await context.Users.AnyAsync())
         {
@@ -36,12 +36,12 @@ public static class DataSeeder
             if (adminRole != null)
             {
                 //var passwordHasher = new PasswordHashService();
- 
+
                 var userId = UuidGenerator.GenerateUserId();
                 var profileId = UuidGenerator.GenerateUserId();
                 var emailId = UuidGenerator.GenerateUserId();
                 var userRoleId = UuidGenerator.GenerateUserId();
- 
+
                 var adminUser = new User
                 {
                     Id = userId,
@@ -77,7 +77,7 @@ public static class DataSeeder
                         }
                     ]
                 };
- 
+
                 await context.Users.AddAsync(adminUser);
                 await context.SaveChangesAsync();
             }

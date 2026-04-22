@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuthService.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260223171137_InitialCreate")]
+    [Migration("20260223171541_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -69,7 +69,8 @@ namespace AuthService.Persistence.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
                         .HasColumnName("email");
 
                     b.Property<string>("Name")
@@ -80,7 +81,8 @@ namespace AuthService.Persistence.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("password");
 
                     b.Property<bool>("Status")
@@ -89,8 +91,8 @@ namespace AuthService.Persistence.Migrations
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("character varying(16)")
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
                         .HasColumnName("surname");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -192,19 +194,17 @@ namespace AuthService.Persistence.Migrations
                         .HasColumnType("character varying(16)")
                         .HasColumnName("id");
 
-                    b.Property<string>("Bio")
+                    b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("bio");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)")
+                        .HasColumnName("phone");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_of_birth");
-
-                    b.Property<string>("ProfilePictureUrl")
+                    b.Property<string>("ProfilePicture")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("profile_picture_url");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
+                        .HasColumnName("profile_picture");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -228,10 +228,6 @@ namespace AuthService.Persistence.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)")
                         .HasColumnName("id");
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("assigned_at");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")

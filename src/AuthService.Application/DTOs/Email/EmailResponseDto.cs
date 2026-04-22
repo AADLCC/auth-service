@@ -1,8 +1,9 @@
-namespace AuthService.Application.Interfaces;
+namespace AuthService.Application.DTOs.Email;
 
-public interface IEmailService
+public class EmailResponseDto
 {
-    Task SendEmailVerificationAsync(string email, string username, string token);
-    Task SendPasswordResetAsync(string email, string username, string token);
-    Task SendWelcomeEmailAsync(string email, string username);
-}
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    // Datos adicionales opcionales (por ejemplo, email verificado, token info, etc.)
+    public object? Data { get; set; }
+} 

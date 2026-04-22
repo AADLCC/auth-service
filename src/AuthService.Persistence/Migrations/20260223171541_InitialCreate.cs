@@ -31,10 +31,10 @@ namespace AuthService.Persistence.Migrations
                 {
                     id = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     name = table.Column<string>(type: "character varying(25)", maxLength: 25, nullable: false),
-                    surname = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
+                    surname = table.Column<string>(type: "character varying(25)", maxLength: 25, nullable: false),
                     username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    email = table.Column<string>(type: "text", nullable: false),
-                    password = table.Column<string>(type: "text", nullable: false),
+                    email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    password = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     status = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -91,9 +91,8 @@ namespace AuthService.Persistence.Migrations
                 {
                     id = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     user_id = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    profile_picture_url = table.Column<string>(type: "text", nullable: false),
-                    bio = table.Column<string>(type: "text", nullable: false),
-                    date_of_birth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    profile_picture = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    phone = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,7 +112,6 @@ namespace AuthService.Persistence.Migrations
                     id = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     user_id = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     role_id = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    assigned_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },

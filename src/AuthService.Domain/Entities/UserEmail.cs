@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-
 namespace AuthService.Domain.Entities;
-
 public class UserEmail
 {
     [Key]
     [MaxLength(16)]
-    public  string Id { get; set; } = string.Empty;
+    public string Id { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(16)]

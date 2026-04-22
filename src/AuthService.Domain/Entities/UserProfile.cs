@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AuthService.Domain.Entities;
 
@@ -11,14 +10,16 @@ public class UserProfile
 
     [Required]
     [MaxLength(16)]
-    [ForeignKey(nameof(User))] // Llave foranea hacia la entidad User
     public string UserId { get; set; } = string.Empty;
 
-    public string ProfilePictureUrl { get; set; } = null!;
-    public string Bio { get; set; } = string.Empty;
-    public DateTime DateOfBirth { get; set; } 
+    [MaxLength(512)]
+    public string ProfilePicture { get; set; } = string.Empty;
 
+    [Required]
+    [StringLength(8, MinimumLength = 8, ErrorMessage = "El número de teléfono debe tener exactamente 8 dígitos.")]
+    [RegularExpression(@"^\d{8}$", ErrorMessage = "El teléfono solo debe contener números.")]
+    public string Phone { get; set; } = string.Empty;
+
+    [Required]
     public User User { get; set; } = null!;
 }
-
-
