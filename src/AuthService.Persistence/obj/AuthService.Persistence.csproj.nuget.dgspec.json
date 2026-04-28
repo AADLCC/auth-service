@@ -61,7 +61,7 @@
             },
             "MailKit": {
               "target": "Package",
-              "version": "[4.16.0, )"
+              "version": "[4.15.0, )"
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
@@ -81,7 +81,7 @@
             },
             "MimeKit": {
               "target": "Package",
-              "version": "[4.16.0, )"
+              "version": "[4.15.0, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",

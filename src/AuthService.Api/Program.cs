@@ -10,35 +10,51 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // CONFIGURACIÓN
 // FIX: Bypass SSL (Cloudinary, etc.)
 System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
 
-// Configuración de Serilog
+
+// Configura Serilog como el motor de registro (logging) principal de tu aplicación
+// reemplazando al sistema por defecto de .NET.
 builder.Host.UseSerilog((context, services, loggerConfiguration) =>
     loggerConfiguration
         .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services));
 
-// Configuración de Controladores y Model Binder
+
+// Integra la configuración de FileDataModelBinderProvider.cs
 builder.Services.AddControllers(options =>
 {
+    // Agregar el model binder para IFileData
     options.ModelBinderProviders.Insert(0, new FileDataModelBinderProvider());
 })
 .AddJsonOptions(o =>
 {
+    // Estandarizar las respuestas en camelCase para coincidir con auth-node
     o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
-// MÉTODOS DE EXTENSIÓN
+
+// CONFIGURACIÓN DE SERVICIOS POR MEDIO DE MÉTODOS DE EXTENSIÓN
 builder.Services.AddApiDocumentation();
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddRateLimitingPolicies();
+
+
+// INTEGRAR SERVICIOS DE SEGURIDAD
 builder.Services.AddSecurityPolicies(builder.Configuration);
 builder.Services.AddSecurityOptions();
 
+
+// .....................................................
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+// .....................................................
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -53,18 +69,18 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build(); 
 
+
 // CONFIGURACIÓN DE HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
-    // REDIRECCIÓN OPCIONAL: Si entras a "/", te manda a Swagger automáticamente
-    app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
+// Add Serilog request logging
 app.UseSerilogRequestLogging();
 
+// Add Security Headers using NetEscapades package
 app.UseSecurityHeaders(policies => policies
     .AddDefaultSecurityHeaders()
     .RemoveServerHeader()
@@ -88,14 +104,13 @@ app.UseSecurityHeaders(policies => policies
     .AddCustomHeader("Cache-Control", "no-store, no-cache, must-revalidate, private")
 );
 
+// Global exception handling
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Solo forzar HTTPS fuera de desarrollo para evitar advertencias de puerto en consola local
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
 
+
+// Core middlewares
+app.UseHttpsRedirection();
 app.UseCors("DefaultCorsPolicy");
 app.UseRateLimiter();
 app.UseAuthentication();
@@ -103,7 +118,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Health check personalizado (estilo Node.js)
+
+// Health check endpoints - both versions for compatibility
+// Standard health check endpoint
+app.MapHealthChecks("/health");
+
+
+// Custom health endpoint to match Node.js response format
 app.MapGet("/health", () =>
 {
     var response = new
@@ -114,10 +135,11 @@ app.MapGet("/health", () =>
     return Results.Ok(response);
 });
 
-// Endpoint adicional de salud si lo necesitas
 app.MapHealthChecks("/api/v1/health");
 
-// Startup log
+
+
+// Startup log: addresses and health endpoint
 var startupLogger = app.Services.GetRequiredService<ILogger<Program>>();
 app.Lifetime.ApplicationStarted.Register(() =>
 {
@@ -135,6 +157,10 @@ app.Lifetime.ApplicationStarted.Register(() =>
                 startupLogger.LogInformation("AuthService API is running at {Url}. Health endpoint: {HealthUrl}", addr, health);
             }
         }
+        else
+        {
+            startupLogger.LogInformation("AuthService API started. Health endpoint: /health");
+        }
     }
     catch (Exception ex)
     {
@@ -142,7 +168,8 @@ app.Lifetime.ApplicationStarted.Register(() =>
     }
 });
 
-// Inicialización de DB
+
+// Initialize database and seed data
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -151,16 +178,21 @@ using (var scope = app.Services.CreateScope())
     try
     {
         logger.LogInformation("Checking database connection...");
+
+        // Ensure database is created (similar to Sequelize sync in Node.js)
         await context.Database.EnsureCreatedAsync();
+
         logger.LogInformation("Database ready. Running seed data...");
         await DataSeeder.SeedAsync(context);
+
         logger.LogInformation("Database initialization completed successfully");
     }
     catch (Exception ex)
     {
         logger.LogError(ex, "An error occurred while initializing the database");
-        throw;
+        throw; // Re-throw to stop the application
     }
 }
+
 
 app.Run();
